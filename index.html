@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>FitHome — No Equipment Workouts</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== APP SHELL ===== -->
+  <div id="app">
+
+    <!-- TOP HEADER (dynamic) -->
+    <header id="top-bar">
+      <button id="back-btn" class="icon-btn hidden" aria-label="Back">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <span id="header-title">FitHome</span>
+      <button id="menu-btn" class="icon-btn" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+    </header>
+
+    <!-- ===== HOME VIEW ===== -->
+    <section id="view-home" class="view active">
+      <div class="hero">
+        <div class="hero-text">
+          <p class="hero-sub">Good morning</p>
+          <h1 class="hero-name" id="greeting-name">Let's move</h1>
+          <p class="hero-desc">No equipment. Small space. Big results.</p>
+        </div>
+        <div class="hero-illustration">
+          <!-- SVG person stretching -->
+          <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="22" r="16" fill="#FF6B35"/>
+            <rect x="48" y="40" width="24" height="48" rx="8" fill="#FF6B35"/>
+            <rect x="28" y="44" width="20" height="8" rx="4" fill="#FF8C5A" transform="rotate(-20 28 44)"/>
+            <rect x="72" y="44" width="20" height="8" rx="4" fill="#FF8C5A" transform="rotate(20 72 44)"/>
+            <rect x="48" y="84" width="10" height="40" rx="5" fill="#FF6B35"/>
+            <rect x="62" y="84" width="10" height="40" rx="5" fill="#FF6B35"/>
+            <rect x="38" y="118" width="20" height="8" rx="4" fill="#FF8C5A"/>
+            <rect x="62" y="118" width="20" height="8" rx="4" fill="#FF8C5A"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Streak / Stats Bar -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-value" id="streak-count">0</span>
+          <span class="stat-label">Day Streak</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">✅</span>
+          <span class="stat-value" id="total-workouts">0</span>
+          <span class="stat-label">Workouts</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">⏱</span>
+          <span class="stat-value" id="total-minutes">0</span>
+          <span class="stat-label">Minutes</span>
+        </div>
+      </div>
+
+      <!-- Today's Plan -->
+      <div class="section-header">
+        <h2>Today's Workout</h2>
+        <span class="badge" id="today-difficulty">Beginner</span>
+      </div>
+      <div class="workout-card today-card" id="today-card">
+        <div class="workout-card-top">
+          <div>
+            <h3 id="today-name">Full Body Boost</h3>
+            <p id="today-meta">4 exercises · 20 min</p>
+          </div>
+          <div class="workout-thumb" id="today-thumb"></div>
+        </div>
+        <div class="exercise-preview" id="today-preview"></div>
+        <button class="btn-primary full-width" onclick="App.startTodayWorkout()">Start Workout</button>
+      </div>
+
+      <!-- Browse Plans -->
+      <div class="section-header">
+        <h2>All Plans</h2>
+      </div>
+      <div class="plans-grid" id="plans-grid"></div>
+    </section>
+
+    <!-- ===== WORKOUT VIEW ===== -->
+    <section id="view-workout" class="view">
+      <div class="workout-overview" id="workout-overview">
+        <h2 id="wk-title"></h2>
+        <p id="wk-meta"></p>
+        <div class="exercise-list" id="exercise-list"></div>
+        <button class="btn-primary full-width" id="begin-btn" onclick="App.beginWorkout()">Begin</button>
+      </div>
+    </section>
+
+    <!-- ===== EXERCISE VIEW (Active) ===== -->
+    <section id="view-exercise" class="view">
+      <div class="exercise-progress-bar">
+        <div class="exercise-progress-fill" id="ex-progress-fill"></div>
+      </div>
+      <div class="exercise-counter" id="ex-counter">1 / 4</div>
+
+      <div class="exercise-illustration" id="ex-illustration"></div>
+
+      <div class="exercise-info">
+        <h2 id="ex-name">Push-Ups</h2>
+        <p class="exercise-tip" id="ex-tip"></p>
+      </div>
+
+      <div class="timer-block">
+        <div class="timer-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="timer-digits" id="timer-digits">0:30</div>
+        </div>
+        <p class="timer-label" id="timer-label">Work</p>
+      </div>
+
+      <div class="exercise-controls">
+        <button class="btn-secondary" onclick="App.prevExercise()">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          Prev
+        </button>
+        <button class="btn-primary large-btn" id="play-btn" onclick="App.toggleTimer()">
+          <svg viewBox="0 0 24 24" id="play-icon"><path d="M8 5v14l11-7z"/></svg>
+          <span id="play-label">Start</span>
+        </button>
+        <button class="btn-secondary" onclick="App.nextExercise()">
+          Next
+          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== COMPLETE VIEW ===== -->
+    <section id="view-complete" class="view">
+      <div class="complete-content">
+        <div class="complete-icon">
+          <!-- Trophy SVG -->
+          <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 10h60v40c0 22-13 34-30 38C33 84 20 72 20 50V10z" fill="#FFD700"/>
+            <path d="M5 14h15v28C20 50 14 56 5 56V14z" fill="#FFC107"/>
+            <path d="M95 14H80v28c0 8 6 14 15 14V14z" fill="#FFC107"/>
+            <rect x="38" y="88" width="24" height="10" rx="3" fill="#B8860B"/>
+            <rect x="28" y="98" width="44" height="12" rx="4" fill="#B8860B"/>
+            <path d="M50 30l4.5 9 10 1.5-7.2 7 1.7 10L50 52.5 41 57.5l1.7-10-7.2-7 10-1.5z" fill="white"/>
+          </svg>
+        </div>
+        <h2>Workout Complete!</h2>
+        <p id="complete-summary"></p>
+        <div class="complete-stats">
+          <div class="cstat">
+            <span class="cstat-val" id="c-exercises">4</span>
+            <span class="cstat-label">Exercises</span>
+          </div>
+          <div class="cstat">
+            <span class="cstat-val" id="c-time">20</span>
+            <span class="cstat-label">Minutes</span>
+          </div>
+          <div class="cstat">
+            <span class="cstat-val" id="c-cal">~120</span>
+            <span class="cstat-label">Calories</span>
+          </div>
+        </div>
+        <button class="btn-primary full-width" onclick="App.goHome()">Back to Home</button>
+        <button class="btn-secondary full-width" onclick="App.viewProgress()">View Progress</button>
+      </div>
+    </section>
+
+    <!-- ===== PROGRESS VIEW ===== -->
+    <section id="view-progress" class="view">
+      <div class="progress-content">
+        <h2>Your Progress</h2>
+
+        <div class="progress-summary-cards">
+          <div class="pscard">
+            <div class="pscard-icon">🔥</div>
+            <div class="pscard-val" id="ps-streak">0</div>
+            <div class="pscard-label">Current Streak</div>
+          </div>
+          <div class="pscard">
+            <div class="pscard-icon">🏆</div>
+            <div class="pscard-val" id="ps-best">0</div>
+            <div class="pscard-label">Best Streak</div>
+          </div>
+          <div class="pscard">
+            <div class="pscard-icon">✅</div>
+            <div class="pscard-val" id="ps-total">0</div>
+            <div class="pscard-label">Total Workouts</div>
+          </div>
+          <div class="pscard">
+            <div class="pscard-icon">⏱</div>
+            <div class="pscard-val" id="ps-minutes">0</div>
+            <div class="pscard-label">Total Minutes</div>
+          </div>
+        </div>
+
+        <div class="section-header"><h2>Weekly Activity</h2></div>
+        <div class="week-grid" id="week-grid"></div>
+
+        <div class="section-header"><h2>Workout History</h2></div>
+        <div class="history-list" id="history-list">
+          <p class="empty-state">No workouts yet. Start your first one!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EXERCISES VIEW ===== -->
+    <section id="view-exercises" class="view">
+      <div class="exercise-library">
+        <h2>Exercise Library</h2>
+        <div class="filter-row" id="filter-row"></div>
+        <div class="library-grid" id="library-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== EXERCISE DETAIL VIEW ===== -->
+    <section id="view-ex-detail" class="view">
+      <div class="ex-detail-content" id="ex-detail-content"></div>
+    </section>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav id="bottom-nav">
+      <button class="nav-btn active" data-view="home" onclick="App.showView('home')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-btn" data-view="exercises" onclick="App.showView('exercises')">
+        <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+        <span>Exercises</span>
+      </button>
+      <button class="nav-btn" data-view="progress" onclick="App.showView('progress')">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        <span>Progress</span>
+      </button>
+    </nav>
+
+  </div><!-- /#app -->
+
+  <script src="app.js"></script>
+</body>
+</html>
